@@ -11,7 +11,7 @@ const port = 4001;
 
 const connectDB = async () => {
     try {
-        const DATABASECONNECTION = 'mongodb+srv://syedtalha102x:Talha12$@cluster0.ap6u2dd.mongodb.net/Attendance?retryWrites=true&w=majority&appName=Cluster0'
+        const DATABASECONNECTION = 'mongodb://127.0.0.1:27017/Attendance'
         if (!DATABASECONNECTION) {
             console.log('Connection is not provided');
         }

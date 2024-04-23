@@ -1,5 +1,8 @@
+import Attendance from '../Models/Attendance.js';
+import Sample from '../Models/Sample.js';
 import User from '../Models/User.js';
 import CryptoJS from 'crypto-js';
+import moment from 'moment-timezone';
 
 const Secret = '3699018882';
 
@@ -153,3 +156,132 @@ export const fetchalluser = async (req, res) => {
         console.log(error);
     }
 }
+
+export const sampleEntry = async (req, res) => {
+    try {
+        const { name } = req.body;
+        let a = new Sample({
+            name
+        })
+        await a.save();
+        res.status(400).json({ a })
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).json({ message: 'Internal Server Error' })
+    }
+}
+
+export const attendanceMark = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(401).json({ message: 'User not found in Record' });
+        }
+
+        const currentDate = moment().startOf('day');
+
+        const existingAttendanceRecord = await Attendance.findOne({ userId: user._id, arrivetime: { $gte: currentDate }, leavetime: { $ne: null } });
+
+        if (existingAttendanceRecord) {
+            return res.status(400).json({ message: 'Attendance record already exists for Current Day' });
+        }
+
+        let attendanceRecord = await Attendance.findOne({ userId: user._id, arrivetime: { $gte: currentDate }, leavetime: null });
+
+        const currentTime = moment.tz('Asia/Karachi').utc();
+        const companyArrivalTime = moment().tz('Asia/Karachi').set({
+            'hour': currentTime.hour(),
+            'minute': currentTime.minute(),
+        }).utc();
+
+        if (!attendanceRecord) {
+            let arrivalMessage;
+
+            const lineancyTime = moment(companyArrivalTime).add(user.lineancytime.minutes, 'minutes');
+
+            if (currentTime.isSameOrBefore(companyArrivalTime)) {
+                arrivalMessage = 'User has arrived on time';
+            } else if (currentTime.isSameOrBefore(lineancyTime)) {
+                arrivalMessage = 'User arrived but within lineancy time';
+            } else {
+                arrivalMessage = 'User has arrived too early';
+                console.log(currentTime);
+            }
+
+            attendanceRecord = new Attendance({
+                userId: user._id,
+                arrivetime: currentTime,
+                leavetime: null,
+                ArriveMessage: arrivalMessage,
+                LeaveMessage: null
+            });
+
+            await attendanceRecord.save();
+
+            // Format arrival time for response
+            const formattedArrivalTime = moment.utc(attendanceRecord.arrivetime).format('YYYY-MM-DD HH:mm:ss');
+
+            res.status(200).json({
+                attendanceRecord: {
+                    userId: attendanceRecord.userId,
+                    arrivetime: formattedArrivalTime,
+                    leavetime: attendanceRecord.leavetime,
+                    ArriveMessage: attendanceRecord.ArriveMessage,
+                    LeaveMessage: attendanceRecord.LeaveMessage,
+                    _id: attendanceRecord._id,
+                    __v: attendanceRecord.__v
+                },
+                arrivalMessage
+            });
+        } else {
+            const userLeaveTime = currentTime;
+            const workingHours = user.workinghours;
+            const Extraminutes = 30;
+            let leaveMessage;
+
+            if (userLeaveTime.isBefore(companyArrivalTime.clone().add(workingHours, 'hours'))) {
+                leaveMessage = 'User has gone too early and before its working hours';
+            } else if (userLeaveTime.isSameOrAfter(companyArrivalTime.clone().add(workingHours, 'hours'))) {
+                if (userLeaveTime.isAfter(companyArrivalTime.clone().add((workingHours * 60) + Extraminutes, 'minutes'))) {
+                    leaveMessage = 'User has worked 30 minutes extra after its working hours';
+                } else {
+                    leaveMessage = 'User has gone';
+                }
+            }
+
+            attendanceRecord.leavetime = userLeaveTime;
+            attendanceRecord.LeaveMessage = leaveMessage;
+
+            await attendanceRecord.save();
+
+            // Format both arrival and leave times for response
+            const formattedArrivalTime = moment.utc(attendanceRecord.arrivetime).format('YYYY-MM-DD HH:mm:ss');
+            const formattedLeaveTime = moment.utc(attendanceRecord.leavetime).format('YYYY-MM-DD HH:mm:ss');
+
+            res.status(200).json({
+                attendanceRecord: {
+                    userId: attendanceRecord.userId,
+                    arrivetime: formattedArrivalTime,
+                    leavetime: formattedLeaveTime,
+                    ArriveMessage: attendanceRecord.ArriveMessage,
+                    LeaveMessage: attendanceRecord.LeaveMessage,
+                    _id: attendanceRecord._id,
+                    __v: attendanceRecord.__v
+                },
+                message: leaveMessage
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
+
+
+

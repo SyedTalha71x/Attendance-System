@@ -6,7 +6,6 @@ const UserSchema = new mongoose.Schema({
     password: { type: String, required: true },
     designation: { type: String },
     lineancytime: {
-        hour: { type: Number },
         minutes: { type: Number },
     },
     role: { type: String, default: 'user' },
