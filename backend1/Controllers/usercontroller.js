@@ -204,10 +204,10 @@ export const attendanceMark = async (req, res) => {
 
             if (currentTime.isSameOrBefore(companyArrivalTime)) {
                 arrivalMessage = 'User has arrived on time';
-            } else if (currentTime.isSameOrBefore(lineancyTime)) {
+            } else if (currentTime.isSame(lineancyTime)) {
                 arrivalMessage = 'User arrived but within lineancy time';
             } else {
-                arrivalMessage = 'User has arrived too early';
+                arrivalMessage = 'User has arrived too late';
                 console.log(currentTime);
             }
 
@@ -280,6 +280,67 @@ export const attendanceMark = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
+
+
+
+export const generateReport = async (req, res) => {
+    try {
+        const { days } = req.params;
+        const { email } = req.body;
+
+        const endDate = moment().endOf('day'); // End date is the current day
+        const startDate = moment().subtract(days - 1, 'days').startOf('day'); // Start date is (days - 1) days ago
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(401).json({ message: 'User not found' });
+        }
+
+        const findRecord = await Attendance.find({
+            userId: user._id,
+            arrivetime: { $gte: startDate },
+            leavetime: { $lte: endDate, $ne: null },
+        });
+
+        const detailedAttendanceRecord = [];
+        const presentDaysSet = new Set();
+
+        for (let record of findRecord) {
+            const date = moment(record.arrivetime).startOf('day').toDate(); // Extracting the date part
+            presentDaysSet.add(date);
+
+            detailedAttendanceRecord.push({
+                date: moment(record.arrivetime).format('YYYY-MM-DD'),
+                arrivetime: moment(record.arrivetime).format('YYYY-MM-DD HH:mm:ss'),
+                leavetime: moment(record.leavetime).format('YYYY-MM-DD HH:mm:ss'),
+                ArriveMessage: record.ArriveMessage,
+                LeaveMessage: record.LeaveMessage
+            });
+        }
+
+        const presentDays = presentDaysSet.size;
+        const totalDaysInRange = endDate.diff(startDate, 'days') + 1; // Total days within the specified range
+        const absentDays = totalDaysInRange - presentDays;
+
+        res.status(200).json({
+            message: 'Report generated successfully',
+            report: {
+                name: user.name,
+                email: user.email,
+                designation: user.designation,
+                presentDays,
+                absentDays,
+                detailedAttendanceRecord // Include detailed attendance records
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
+
+
 
 
 

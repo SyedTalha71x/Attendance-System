@@ -1,4 +1,4 @@
-import { signup, login, getuser, addUser, updateUser, deleteUser, fetchalluser, attendanceMark, sampleEntry } from "../Controllers/usercontroller.js";
+import { signup, login, getuser, addUser, updateUser, deleteUser, fetchalluser, attendanceMark, sampleEntry, generateReport } from "../Controllers/usercontroller.js";
 import express from 'express';
 import fetchuser from '../Middleware/fetchuser.js'
 
@@ -12,5 +12,5 @@ router.delete('/deleteuser/:id', fetchuser, deleteUser);
 router.get('/fetchallusers', fetchalluser);
 router.post('/Markattendance', attendanceMark);
 router.post('/sampleentry', sampleEntry);
-
+router.post('/generatereport/:days', generateReport);
 export default router;
