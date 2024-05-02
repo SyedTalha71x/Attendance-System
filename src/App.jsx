@@ -6,6 +6,8 @@ import Homepage from './Components/Homepage';
 import Header from './Components/Header';
 import { State } from './Context/State';
 import Create from './Components/Create';
+import Adminpanel from './Components/Adminpanel';
+import Report from './Components/Report';
 
 
 
@@ -20,6 +22,8 @@ function App() {
             <Route path='/Login' element={<Login />} />
             <Route path='/signup' element={<Signup />} />
             <Route path='/Create' element={<Create />} />
+            <Route path='/Adminpanel' element={<Adminpanel />} />
+            <Route path='/Report' element={<Report />} />
           </Routes >
         </Router>
       </State>

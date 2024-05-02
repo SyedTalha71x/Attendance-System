@@ -2,6 +2,11 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 
 const Header = () => {
+
+    const logout = () => {
+        localStorage.removeItem('token');
+        window.location.href = '/'
+    }
     return (
 
 
@@ -23,12 +28,18 @@ const Header = () => {
                             <Link to={"/"} className="block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Home</Link>
                         </li>
                         <li>
-                            <Link to={"/Create"} className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Create</Link>
+                            <Link to={"/Adminpanel"} className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Admin Panel</Link>
                         </li>
-                        <button>
-                            <Link to={"/Login"} className='bg-purple-600 text-white py-2 px-8 rounded-sm'>Admin</Link>
-                        </button>
+
                     </ul>
+                    <div className='absolute top-4 right-28 '>
+                        {localStorage.getItem('token') ?
+                            <button onClick={logout} className='bg-blue-900 text-white py-2 px-8 text-center rounded-md'>Logout</button>
+                            : <Link to={"/Login"}>
+                                <button className='bg-blue-900 text-white py-2 px-8 text-center rounded-md'>Login</button>
+                            </Link>}
+                    </div>
+
                 </div>
             </div>
         </nav>

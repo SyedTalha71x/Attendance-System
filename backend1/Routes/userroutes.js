@@ -1,4 +1,4 @@
-import { signup, login, getuser, addUser, updateUser, deleteUser, fetchalluser, attendanceMark, sampleEntry, generateReport } from "../Controllers/usercontroller.js";
+import { signup, login, getuser, addUser, updateUser, deleteUser, fetchalluser, attendanceMark, sampleEntry, generateReport, fetchallusers } from "../Controllers/usercontroller.js";
 import express from 'express';
 import fetchuser from '../Middleware/fetchuser.js'
 
@@ -13,4 +13,5 @@ router.get('/fetchallusers', fetchalluser);
 router.post('/Markattendance', attendanceMark);
 router.post('/sampleentry', sampleEntry);
 router.post('/generatereport/:days', generateReport);
+router.get('/fetchall', fetchallusers);
 export default router;

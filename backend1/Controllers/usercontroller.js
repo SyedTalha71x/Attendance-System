@@ -289,7 +289,7 @@ export const generateReport = async (req, res) => {
         const { days } = req.params;
         const { email } = req.body;
 
-        const endDate = moment().endOf('day'); // End date is the current day
+        // const endDate = moment().endOf('day'); // End date is the current day
         const startDate = moment().subtract(days - 1, 'days').startOf('day'); // Start date is (days - 1) days ago
 
         const user = await User.findOne({ email });
@@ -300,14 +300,15 @@ export const generateReport = async (req, res) => {
         const findRecord = await Attendance.find({
             userId: user._id,
             arrivetime: { $gte: startDate },
-            leavetime: { $lte: endDate, $ne: null },
+            leavetime: { $ne: null },
         });
 
         const detailedAttendanceRecord = [];
         const presentDaysSet = new Set();
+        // adding a set because taky agr koi same record mojod hu database mai to sirf unique hi uth kr aie 
 
         for (let record of findRecord) {
-            const date = moment(record.arrivetime).startOf('day').toDate(); // Extracting the date part
+            const date = moment(record.arrivetime).startOf('day').toDate(); // date lerhy moment sai
             presentDaysSet.add(date);
 
             detailedAttendanceRecord.push({
@@ -319,9 +320,9 @@ export const generateReport = async (req, res) => {
             });
         }
 
-        const presentDays = presentDaysSet.size;
-        const totalDaysInRange = endDate.diff(startDate, 'days') + 1; // Total days within the specified range
-        const absentDays = totalDaysInRange - presentDays;
+        let presentDays = presentDaysSet.size;
+        let totalDaysInRange = days; // Calculate total days in range directly from the 'days' parameter
+        let absentDays = totalDaysInRange - presentDays;
 
         res.status(200).json({
             message: 'Report generated successfully',
@@ -339,6 +340,21 @@ export const generateReport = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 };
+
+
+export const fetchallusers = async (req, res) => {
+    try {
+        const users = await User.find({ role: 'user' });
+
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'No users found.' });
+        }
+        return res.status(200).json(users);
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        return res.status(500).json({ message: 'Internal server error.' });
+    }
+}
 
 
 
