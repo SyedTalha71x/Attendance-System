@@ -281,6 +281,18 @@ export const attendanceMark = async (req, res) => {
     }
 };
 
+export const fetchallemails = async (req, res) => {
+    try {
+        const emails = await User.find({}, { email: 1 });
+        const allEmails = emails.map(user => user.email);
+        res.status(200).json({ emails: allEmails });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+}
+
+
 
 
 

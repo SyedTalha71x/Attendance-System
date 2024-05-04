@@ -13,6 +13,7 @@ const ReportGenerator = () => {
     const [report, setReport] = useState(null);
     const [error, setError] = useState(null);
     const [chartInstance, setChartInstance] = useState(null);
+    const [emailSuggestions, setemailSuggestions] = useState([])
     const [chartKey, setChartKey] = useState(0);
 
     const generateReport = async () => {
@@ -27,6 +28,22 @@ const ReportGenerator = () => {
             setError('Error generating report. Please try again.');
         }
     };
+
+    useEffect(() => {
+        const fetchallemails = async () => {
+            try {
+                const url = `${BASE_URL}/api/user/fetchallemails`
+                const response = await axios.get(url);
+                setemailSuggestions(response.data.emails)
+            }
+            catch (error) {
+                console.log('Error while fetching all emails')
+            }
+        }
+
+        fetchallemails();
+    }, [])
+
 
     useEffect(() => {
         if (chartInstance) {
@@ -70,7 +87,12 @@ const ReportGenerator = () => {
                     <div>
                         <label className='m-2'>
                             Email
-                            <input className='py-2 px-12 ml-2 bg-gray-200 outline-none mt-2' type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <input list="emailSuggestions" className='py-2 px-12 ml-2 bg-gray-200 outline-none mt-2' type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                            <datalist id="emailSuggestions">
+                                {emailSuggestions.map((suggestion, index) => (
+                                    <option key={index} value={suggestion} />
+                                ))}
+                            </datalist>
                         </label>
                     </div>
                     <button onClick={generateReport} className='bg-purple-700 text-white py-2 px-[85px] mt-6 m-[54px]'>Generate Report</button>
@@ -81,6 +103,35 @@ const ReportGenerator = () => {
                         <canvas key={chartKey} id="myChart" />
                     </div>
                 </div>
+            </section>
+            <section className='mt-[15%] mb-[10%]'>
+                {report && (
+                    <div >
+                        <h2 className='mb-4'>Detailed Attendance Record</h2>
+                        <table className='w-full p-10 border-collapse border border-gray-200'>
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Arrival Time</th>
+                                    <th>Leave Time</th>
+                                    <th>Arrival Message</th>
+                                    <th>Leave Message</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {report.detailedAttendanceRecord.map((record, index) => (
+                                    <tr key={index}>
+                                        <td>{record.date}</td>
+                                        <td>{record.arrivetime}</td>
+                                        <td>{record.leavetime}</td>
+                                        <td>{record.ArriveMessage}</td>
+                                        <td>{record.LeaveMessage}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
             </section>
         </div>
     );
