@@ -104,10 +104,10 @@ const ReportGenerator = () => {
                     </div>
                 </div>
             </section>
-            <section className='mt-[15%] mb-[10%]'>
+            <section className='mt-[5%] mb-[10%]'>
                 {report && (
                     <div >
-                        <h2 className='mb-4'>Detailed Attendance Record</h2>
+                        <h2 className='mb-4 text-2xl font-bold'>Detailed Attendance Record</h2>
                         <table className='w-full p-10 border-collapse border border-gray-200'>
                             <thead>
                                 <tr>
