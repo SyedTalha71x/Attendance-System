@@ -1,0 +1,1 @@
+scenarios is that , calculate that how many users were present and absents on the basis of days which i will pass in parameter

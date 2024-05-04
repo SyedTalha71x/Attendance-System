@@ -381,14 +381,54 @@ export const getallUsers = async (req, res) => {
 
 export const weeklyReport = async (req, res) => {
     try {
+        const { days } = req.params;
+        const numberOfDays = parseInt(days);
+
+        // Initialize an array to store reports for each day
+        const dailyReports = [];
+
+        // Iterate through each day within the specified period
+        for (let i = 0; i < numberOfDays; i++) {
+            const currentDate = moment().subtract(i, 'days').startOf('day');
+            const nextDate = moment().subtract(i, 'days').endOf('day');
+
+            // Get attendance records for the current day
+            const attendanceRecords = await Attendance.find({
+                arrivetime: { $gte: currentDate, $lte: nextDate },
+                leavetime: { $ne: null }
+            });
+
+            // Count unique users present on the current day
+            const presentUsers = new Set();
+            for (const record of attendanceRecords) {
+                presentUsers.add(record.userId.toString());
+            }
+
+            // Calculate absent users for the current day
+            const allUsers = await User.find({ role: 'user' });
+            const absentUsers = allUsers.filter(user => !presentUsers.has(user._id.toString()));
+
+            // Push the report for the current day to the dailyReports array
+            dailyReports.push({
+                date: currentDate.format('YYYY-MM-DD'),
+                presentUsers: presentUsers.size,
+                absentUsers: absentUsers.length
+            });
+        }
+
+        res.status(200).json({
+            message: 'Reports generated successfully',
+            dailyReports
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+};
 
 
-    }
-    catch (error) {
-        console.log(error);
-        res.status(400).json({ message: 'Internal Server Error' })
-    }
-}
+
+
 
 
 

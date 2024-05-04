@@ -21,6 +21,18 @@ const Create = () => {
         workinghours: ''
     });
 
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/Login')
+        }
+      
+
+    }, [])
+
+
     const addUser = async () => {
         const url = `${BASE_URL}/api/user/adduser`;
         try {
