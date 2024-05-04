@@ -12,3 +12,7 @@
     --font5: 'Montserrat', sans-serif;
     --font6: 'Montserrat', sans-serif;
 }
+
+body {
+    cursor: pointer;
+}

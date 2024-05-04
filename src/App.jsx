@@ -10,6 +10,7 @@ import Adminpanel from './Components/Adminpanel';
 import Report from './Components/Report';
 import UserList from '../src/Components/Userlist'
 import Attendance from '../src/Components/Attendance'
+import Dashboard from '../src/Components/Dashboard'
 
 
 
@@ -18,9 +19,8 @@ function App() {
     <>
       <State>
         <Router>
-          <Header />
           <Routes>
-            <Route path='/' element={<Homepage />} />
+          <Route path='/' element={<Dashboard />} />
             <Route path='/Login' element={<Login />} />
             <Route path='/signup' element={<Signup />} />
             <Route path='/Create' element={<Create />} />

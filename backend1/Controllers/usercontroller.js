@@ -368,6 +368,28 @@ export const fetchallusers = async (req, res) => {
     }
 }
 
+export const getallUsers = async (req, res) => {
+    try {
+        const fetchallUsers = await User.countDocuments();
+        res.json(fetchallUsers);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).json({ message: 'Internal Server Error' })
+    }
+}
+
+export const weeklyReport = async (req, res) => {
+    try {
+
+
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).json({ message: 'Internal Server Error' })
+    }
+}
+
 
 
 

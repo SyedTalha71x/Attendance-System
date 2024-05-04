@@ -64,9 +64,6 @@ const ReportGenerator = () => {
                         hoverOffset: 4
                     }]
                 },
-                options: {
-                    // Add any custom options here
-                }
             });
 
             setChartInstance(newChartInstance);
@@ -119,13 +116,13 @@ const ReportGenerator = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {report.detailedAttendanceRecord.map((record, index) => (
+                                {report?.detailedAttendanceRecord.map((record, index) => (
                                     <tr key={index}>
-                                        <td>{record.date}</td>
-                                        <td>{record.arrivetime}</td>
-                                        <td>{record.leavetime}</td>
-                                        <td>{record.ArriveMessage}</td>
-                                        <td>{record.LeaveMessage}</td>
+                                        <td>{record?.date}</td>
+                                        <td>{record?.arrivetime}</td>
+                                        <td>{record?.leavetime}</td>
+                                        <td>{record?.ArriveMessage}</td>
+                                        <td>{record?.LeaveMessage}</td>
                                     </tr>
                                 ))}
                             </tbody>
